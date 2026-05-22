@@ -1,0 +1,40 @@
+# Forgejo Actions : à chaque push sur main, lit la version de manifest.json
+# et crée le tag « vX.Y.Z » s'il n'existe pas encore (qui déclenche release.yml).
+# Versionnage délibéré : c'est toi qui bumpes manifest.json quand tu veux publier.
+name: Tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Tag from manifest version
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+        run: |
+          set -eu
+          VERSION=$(sed -nE 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p' \
+            custom_components/stade_de_france/manifest.json | head -1)
+          TAG="v$VERSION"
+
+          git fetch --tags
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG existe déjà — rien à faire."
+            exit 0
+          fi
+
+          git config user.name "stelone"
+          git config user.email "8436858+stelone@users.noreply.github.com"
+          git remote set-url origin \
+            "https://ci:$FORGEJO_TOKEN@${{ vars.FORGEJO_URL }}/kaz/ha-stade-de-france.git"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+          echo "Tag $TAG créé."
