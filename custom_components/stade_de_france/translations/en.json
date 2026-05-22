@@ -1,0 +1,53 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Stade de France",
+        "description": "Track Stade de France events and get notified before each one. You can choose the notification service and lead time in the options."
+      }
+    },
+    "abort": {
+      "already_configured": "Stade de France is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Stade de France options",
+        "data": {
+          "notify_service": "Notification service",
+          "lead_days": "Lead time before event (days)",
+          "notify_time": "Notification time"
+        },
+        "data_description": {
+          "notify_service": "The notify service to call (e.g. notify.mobile_app_iphone). Leave empty to disable sending.",
+          "lead_days": "Number of days before the event (0 = same day).",
+          "notify_time": "Time of day the notification is sent."
+        }
+      }
+    }
+  },
+  "entity": {
+    "calendar": {
+      "events": {
+        "name": "Events"
+      }
+    },
+    "sensor": {
+      "next_event": {
+        "name": "Next event"
+      },
+      "days_until_next": {
+        "name": "Days until next event"
+      },
+      "event_count": {
+        "name": "Event count"
+      }
+    },
+    "binary_sensor": {
+      "event_upcoming": {
+        "name": "Event upcoming"
+      }
+    }
+  }
+}

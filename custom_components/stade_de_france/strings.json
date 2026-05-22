@@ -1,0 +1,53 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Stade de France",
+        "description": "Suivre les événements du Stade de France et recevoir une notification avant chaque événement. Vous pourrez choisir le service de notification et le délai dans les options."
+      }
+    },
+    "abort": {
+      "already_configured": "Stade de France est déjà configuré."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options Stade de France",
+        "data": {
+          "notify_service": "Service de notification",
+          "lead_days": "Délai avant l'événement (jours)",
+          "notify_time": "Heure de la notification"
+        },
+        "data_description": {
+          "notify_service": "Service notify appelé (ex. notify.mobile_app_iphone). Laissez vide pour désactiver l'envoi.",
+          "lead_days": "Nombre de jours avant l'événement (0 = le jour même).",
+          "notify_time": "Heure à laquelle la notification est envoyée."
+        }
+      }
+    }
+  },
+  "entity": {
+    "calendar": {
+      "events": {
+        "name": "Événements"
+      }
+    },
+    "sensor": {
+      "next_event": {
+        "name": "Prochain événement"
+      },
+      "days_until_next": {
+        "name": "Jours avant le prochain événement"
+      },
+      "event_count": {
+        "name": "Nombre d'événements"
+      }
+    },
+    "binary_sensor": {
+      "event_upcoming": {
+        "name": "Événement imminent"
+      }
+    }
+  }
+}
