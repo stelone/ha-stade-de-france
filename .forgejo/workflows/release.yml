@@ -1,6 +1,5 @@
-# Forgejo Actions: crée une Release Forgejo quand un tag « v* » est poussé.
-# Utilise le token intégré du runner (aucun secret à configurer).
-# Le corps de la release reprend le message du tag annoté.
+# Forgejo Actions : crée une Release Forgejo quand un tag « v* » est poussé.
+# Convention alignée sur kaz-proxy : runs-on docker + secrets.FORGEJO_TOKEN.
 name: Release
 
 on:
@@ -10,25 +9,24 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: docker
     steps:
-      - name: Checkout (avec les tags)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Créer la release Forgejo
+      - name: Create Forgejo release
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}   # token auto du runner Forgejo
-          SERVER: ${{ github.server_url }}     # ex. https://forge.home.sdalens.com
-          REPO: ${{ github.repository }}       # ex. Kaz/ha-stade-de-france
-          TAG: ${{ github.ref_name }}          # ex. v0.1.0
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+          SERVER: ${{ github.server_url }}     # https://forge.home.sdalens.com
+          REPO: ${{ github.repository }}       # Kaz/ha-stade-de-france
+          TAG: ${{ github.ref_name }}          # v0.1.0
         run: |
           set -eu
           api="$SERVER/api/v1/repos/$REPO/releases"
 
           # Idempotent : ne rien faire si la release existe déjà.
-          if curl -fsSL -H "Authorization: token $TOKEN" \
+          if curl -fsSL -H "Authorization: token $FORGEJO_TOKEN" \
                "$api/tags/$TAG" >/dev/null 2>&1; then
             echo "Release $TAG déjà existante — rien à faire."
             exit 0
@@ -38,12 +36,12 @@ jobs:
           NOTES="$(git tag -l --format='%(contents)' "$TAG")"
           [ -n "$NOTES" ] || NOTES="Release $TAG"
 
-          # JSON encodé proprement via node (présent dans le runner).
+          # JSON encodé proprement via node (présent dans l'image des runners).
           BODY="$(TAG="$TAG" NOTES="$NOTES" node -e \
             'process.stdout.write(JSON.stringify({tag_name:process.env.TAG,name:process.env.TAG,body:process.env.NOTES}))')"
 
           curl -fsSL -X POST "$api" \
-            -H "Authorization: token $TOKEN" \
+            -H "Authorization: token $FORGEJO_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$BODY"
           echo "Release $TAG créée."

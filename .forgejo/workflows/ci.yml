@@ -1,19 +1,17 @@
-# Forgejo Actions pipeline (also valid GitHub Actions syntax).
-# Runs the test suite. The `ubuntu-latest` label is mapped to a container image
-# by the Forgejo act_runner default configuration.
+# Forgejo Actions : lance la suite de tests. Convention kaz-proxy : runs-on docker.
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: docker
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
